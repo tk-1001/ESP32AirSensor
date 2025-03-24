@@ -16,7 +16,7 @@ class MainLoop:
 
     def __init__(self):
         self.load_configuration()
-        self.minutes = self.configuration['refresh_minutes']
+        self.minutes = int(self.configuration['refresh_minutes'])
 
         if self.configuration['splash_screen'] == 'y':
             show_splash_screen()
