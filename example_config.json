@@ -1,0 +1,17 @@
+{
+  "network": {
+    "ssid": "wifi_ssid",
+    "pass": "wifi_password"
+  },
+  "logging": "release",
+  "theme": "light",
+  "sensors": {
+    "sensor1": "sensors_ip_address",
+    "sensor2": "sensors_ip_address"
+  },
+  "image_connection": "all",
+  "image_type": "bitmap",
+  "splash_screen": "y",
+  "time_zone": "+1",
+  "refresh_minutes": 30
+}
