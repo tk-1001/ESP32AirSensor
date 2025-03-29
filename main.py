@@ -23,8 +23,13 @@ class MainLoop:
         self.connect_to_network()
 
         while True:
-            self.main_loop(self.check_if_connected_to_wifi())
-            time.sleep(60 * self.minutes)
+            try:
+                self.main_loop(self.check_if_connected_to_wifi())
+                time.sleep(60 * self.minutes)
+            except Exception as e:
+                print(e)
+                with open("sd/errors.txt", "a+") as f:
+                    f.write(str(e))
 
     def load_configuration(self, config_path='config.json'):
         self.configuration = ujson.load(open(config_path))
@@ -61,7 +66,7 @@ class MainLoop:
         if self.configuration['sensors']['sensor2'] is not "":
             air_levels = self.save_status(self.configuration['sensors']['sensor2'])
             air_status = get_pm_status(air_levels)
-            air_sensors.append([air_status, air_levels])
+            air_sensors.append([air_levels, air_status])
 
         # print(air_levels)
         # print(air_status)
