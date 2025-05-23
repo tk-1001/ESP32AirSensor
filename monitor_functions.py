@@ -9,7 +9,7 @@ from inkplate6COLOR import Inkplate
 from emojis_in_bitmaps_black import smiley_face_b, medium_face_b, medium_face_orange_b, angry_face_b
 from emojis_in_bitmaps import smiley_face, medium_face, medium_face_orange, angry_face
 
-from api_functions import get_pm10_norm_percent, get_pm25_norm_percent
+from api_functions import get_pm10_norm_percent, get_pm25_norm_percent, get_pm1_norm_percent
 
 display = Inkplate()
 display.begin()
@@ -90,13 +90,21 @@ def show_pm_sensor_levels(x,y, pm_levels, pm_status, font_size, theme):
         pm25_color = get_color_of_pm_level(pm_status['pm2.5'])
         pm10_color = get_color_of_pm_level(pm_status['pm10'])
 
-    display.printText(x+10, y+10, f'PM1: {pm_levels['pm1']}', pm1_color)
 
-    display.printText(x+10, y+70, f'PM2.5: {pm_levels['pm2.5']}', pm25_color)
-    display.printText(x+10, y+110, f'{get_pm25_norm_percent(pm_levels['pm2.5'])}%', pm25_color)
+    pm1_levels = pm_levels['pm1']
+    display.printText(x+10, y+10, f'PM1: {pm1_levels}', pm1_color)
+    pm1_norm_percent = get_pm1_norm_percent(pm_levels['pm1'])
+    display.printText(x + 10, y + 50, f'{pm1_norm_percent}%', pm25_color)
 
-    display.printText(x+10, y+170, f'PM10: {pm_levels["pm10"]}', pm10_color)
-    display.printText(x+10, y+210, f'{get_pm10_norm_percent(pm_levels['pm10'])}%', pm10_color)
+    pm25_levels  = pm_levels['pm2.5']
+    display.printText(x+10, y+95, f'PM2.5: {pm25_levels}', pm25_color)
+    pm25_norm_percent = get_pm25_norm_percent(pm_levels['pm2.5'])
+    display.printText(x+10, y+135, f'{pm25_norm_percent}%', pm25_color)
+
+    pm10_levels = pm_levels['pm10']
+    display.printText(x+10, y+180, f'PM10: {pm10_levels}', pm10_color)
+    pm10_norm_percent = get_pm10_norm_percent(pm_levels['pm10'])
+    display.printText(x+10, y+220, f'{pm10_norm_percent}%', pm10_color)
 
 
 def show_color_examples():
@@ -137,11 +145,17 @@ def show_time(theme='light', time_zone='+0'):
         elif time_zone[0] == '-':
             hours-=int(time_zone[1])
 
+        if minutes < 10:
+            minutes = str(minutes)
+            minutes = '0' + minutes
+
         formatted_time = f"{hours}:{minutes}:{seconds}"
         print(formatted_time)
     except Exception as e:
-        print(f"Error syncing time: {formatted_time}")
-
+        print(f"Error syncing time: {formatted_time} {e}")
+    finally:
+        if formatted_time is None:
+            show_time(theme, time_zone)
 
     if theme == 'light':
         display.printText(270, 405, formatted_time, display.BLACK)

@@ -61,9 +61,13 @@ def get_air_status(ip_address):
     time.sleep(1)
     return r.json()
 
+def get_pm1_norm_percent(pm1_level):
+    return int(pm1_level/15 * 100)
+
 def get_pm25_norm_percent(pm25_level):
     return int(pm25_level/20 * 100)
 
 def get_pm10_norm_percent(pm10_level):
     return int(pm10_level/40 * 100)
+
 

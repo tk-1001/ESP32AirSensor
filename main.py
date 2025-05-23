@@ -28,8 +28,9 @@ class MainLoop:
                 time.sleep(60 * self.minutes)
             except Exception as e:
                 print(e)
-                with open("sd/errors.txt", "a+") as f:
-                    f.write(str(e))
+                # with open("sd/errors.txt", "a+") as f:
+                #     f.write(str(e))
+
 
     def load_configuration(self, config_path='config.json'):
         self.configuration = ujson.load(open(config_path))
