@@ -149,6 +149,10 @@ def show_time(theme='light', time_zone='+0'):
             minutes = str(minutes)
             minutes = '0' + minutes
 
+        if seconds < 10:
+            seconds = str(seconds)
+            seconds = '0' + seconds
+
         formatted_time = f"{hours}:{minutes}:{seconds}"
         print(formatted_time)
     except Exception as e:
