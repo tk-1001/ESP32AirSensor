@@ -2,6 +2,7 @@ import os
 import ujson
 import time
 import network
+import ntptime
 
 # from dotenv import load_dotenv
 
@@ -24,7 +25,14 @@ class MainLoop:
 
         while True:
             try:
-                self.main_loop(self.check_if_connected_to_wifi())
+                while True:
+                    connection_status = self.check_if_connected_to_wifi()
+                    if not connection_status:
+                        self.connect_to_network()
+                    else:
+                        break
+
+                self.main_loop(connection_status)
                 time.sleep(60 * self.minutes)
             except Exception as e:
                 print(e)
@@ -57,6 +65,39 @@ class MainLoop:
             self.connect_to_network()
         print('Network connection established.')
 
+    def get_time(self, time_zone="+0"):
+        ntptime.host = "1.europe.pool.ntp.org"
+        formatted_time = None
+
+        while formatted_time is None:
+            try:
+                # print("Local time before synchronization：%s" % str(time.localtime()))
+                # make sure to have internet connection
+                ntptime.settime()
+                # print("Local time after synchronization：%s" % str(time.localtime()))
+                time_to_format = time.localtime()
+                hours, minutes, seconds = time_to_format[3], time_to_format[4], time_to_format[5]
+                if time_zone[0] == '+':
+                    hours += int(time_zone[1])
+                elif time_zone[0] == '-':
+                    hours -= int(time_zone[1])
+
+                if minutes < 10:
+                    minutes = str(minutes)
+                    minutes = '0' + minutes
+
+                if seconds < 10:
+                    seconds = str(seconds)
+                    seconds = '0' + seconds
+
+                formatted_time = f"{hours}:{minutes}:{seconds}"
+                print(formatted_time)
+            except Exception as e:
+                print(f"Error syncing time: {formatted_time} {e}")
+                time.sleep(1)
+
+        return formatted_time
+
     def main_loop(self, is_connected):
         air_sensors = []
 
@@ -72,7 +113,9 @@ class MainLoop:
         # print(air_levels)
         # print(air_status)
         # air_sensors = [[{'pm2.5': 1, 'pm1': 0, 'pm10': 1}, {'pm1': 'green', 'pm2.5': 'green', 'pm10': 'green'}],[{'pm2.5': 1, 'pm1': 0, 'pm10': 1}, {'pm1': 'green', 'pm2.5': 'green', 'pm10': 'green'}]]
-        show_pm_interface(air_sensors, image_type=self.configuration['image_type'], image_connection=self.configuration['image_connection'], theme=self.configuration['theme'], is_connected=is_connected, time_zone=self.configuration['time_zone'])
+        formatted_time = self.get_time(self.configuration['time_zone'])
+
+        show_pm_interface(formatted_time,air_sensors, image_type=self.configuration['image_type'], image_connection=self.configuration['image_connection'], theme=self.configuration['theme'], is_connected=is_connected)
 
 
 

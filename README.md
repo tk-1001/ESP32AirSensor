@@ -33,10 +33,8 @@ arguments in json
 - refresh_time (1-(maxint)) set refresh time to be every x amount of minutes
 
 TODO:  
-add colors to faces (to test)  
-add json (to test)
-connect faces to the value set in config (to test)
-add light and dark mode (to test)
+Probably in need of using new version of micropython or ntptime library 
+Error syncing time: None [Errno 116] ETIMEDOUT
 
 [//]: # (add logging)
 optional - add logging to external file on sd card

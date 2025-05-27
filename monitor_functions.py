@@ -1,6 +1,5 @@
 import os
 # import importlib.util
-import ntptime
 import time
 
 from inkplate6COLOR import Inkplate
@@ -128,46 +127,17 @@ def show_splash_screen():
 
     display.display()
 
-def show_time(theme='light', time_zone='+0'):
-    ntptime.host = "1.europe.pool.ntp.org"
-    formatted_time = None
 
 
-    try:
-        # print("Local time before synchronization：%s" % str(time.localtime()))
-        # make sure to have internet connection
-        ntptime.settime()
-        # print("Local time after synchronization：%s" % str(time.localtime()))
-        time_to_format = time.localtime()
-        hours, minutes, seconds = time_to_format[3], time_to_format[4], time_to_format[5]
-        if time_zone[0] == '+':
-            hours+=int(time_zone[1])
-        elif time_zone[0] == '-':
-            hours-=int(time_zone[1])
 
-        if minutes < 10:
-            minutes = str(minutes)
-            minutes = '0' + minutes
-
-        if seconds < 10:
-            seconds = str(seconds)
-            seconds = '0' + seconds
-
-        formatted_time = f"{hours}:{minutes}:{seconds}"
-        print(formatted_time)
-    except Exception as e:
-        print(f"Error syncing time: {formatted_time} {e}")
-    finally:
-        if formatted_time is None:
-            show_time(theme, time_zone)
-
+def show_time(formatted_time ,theme='light'):
     if theme == 'light':
         display.printText(270, 405, formatted_time, display.BLACK)
     else:
         display.printText(270, 405, formatted_time, display.WHITE)
 
 
-def show_pm_interface(air_sensors, image_type='bitmap', image_connection='all', theme='light', is_connected='False', time_zone='+0'):
+def show_pm_interface(formatted_time ,air_sensors, image_type='bitmap', image_connection='all', theme='light', is_connected='False'):
     display.clearDisplay()
 
     if theme == 'dark':
@@ -187,7 +157,7 @@ def show_pm_interface(air_sensors, image_type='bitmap', image_connection='all', 
 
     show_color_examples()
 
-    show_time(theme, time_zone)
+    show_time(formatted_time ,theme)
 
     pm_status = air_sensors[0][1]
 
