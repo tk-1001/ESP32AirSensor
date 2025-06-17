@@ -11,13 +11,16 @@ from monitor_functions import show_pm_interface, show_splash_screen
 
 
 class MainLoop:
-    minutes = 30
+    refresh_minutes = 30
     configuration = None
     sta_if = None
 
+    synced_time = None
+    current_time = None
+
     def __init__(self):
         self.load_configuration()
-        self.minutes = int(self.configuration['refresh_minutes'])
+        self.refresh_minutes = int(self.configuration['refresh_minutes'])
 
         if self.configuration['splash_screen'] == 'y':
             show_splash_screen()
@@ -33,12 +36,29 @@ class MainLoop:
                         break
 
                 self.main_loop(connection_status)
-                time.sleep(60 * self.minutes)
+                time.sleep(60 * self.refresh_minutes)
             except Exception as e:
                 print(e)
-                # with open("sd/errors.txt", "a+") as f:
-                #     f.write(str(e))
+                self.write_errors(e)
 
+    @staticmethod
+    def write_errors(e):
+        error_file_path = "sd/errors.txt"
+        try:
+            with open(error_file_path, "r") as f:
+                lines = f.readlines()
+
+            if len(lines) > 100:
+                lines = lines[1:]
+                lines.append(str(e) + "\n")
+                with open(error_file_path, "w") as f:
+                    f.writelines(lines)
+            else:
+                with open(error_file_path, "a") as f:
+                    f.write(str(e)+ "\n")
+        except FileNotFoundError:
+            with open(error_file_path, "a+") as f:
+                f.write(str(e) + "\n")
 
     def load_configuration(self, config_path='config.json'):
         self.configuration = ujson.load(open(config_path))
@@ -65,10 +85,10 @@ class MainLoop:
             self.connect_to_network()
         print('Network connection established.')
 
-    def get_time(self, time_zone="+0"):
-        ntptime.host = "1.europe.pool.ntp.org"
+    @staticmethod
+    def synchronize_time(time_zone="+0"):
+        # ntptime.host = "1.europe.pool.ntp.org"
         formatted_time = None
-
         while formatted_time is None:
             try:
                 # print("Local time before synchronization：%s" % str(time.localtime()))
@@ -81,6 +101,10 @@ class MainLoop:
                     hours += int(time_zone[1])
                 elif time_zone[0] == '-':
                     hours -= int(time_zone[1])
+
+                if hours < 10:
+                    hours = str(hours)
+                    hours = '0' + hours
 
                 if minutes < 10:
                     minutes = str(minutes)
@@ -95,7 +119,11 @@ class MainLoop:
             except Exception as e:
                 print(f"Error syncing time: {formatted_time} {e}")
                 time.sleep(1)
+        return formatted_time
 
+    def get_time(self, time_zone="+0"):
+
+        formatted_time = self.synchronize_time(time_zone)
         return formatted_time
 
     def main_loop(self, is_connected):
