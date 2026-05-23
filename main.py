@@ -3,6 +3,7 @@ import ujson
 import time
 import network
 import ntptime
+import machine
 
 # from dotenv import load_dotenv
 
@@ -36,10 +37,17 @@ class MainLoop:
                         break
 
                 self.main_loop(connection_status)
-                time.sleep(60 * self.refresh_minutes)
+                self.sleep_until_next_refresh()
             except Exception as e:
                 print(e)
                 self.write_errors(e)
+
+    def sleep_until_next_refresh(self):
+        if self.sta_if is not None:
+            self.sta_if.disconnect()
+            self.sta_if.active(False)
+
+        machine.deepsleep(60 * self.refresh_minutes * 1000)
 
     @staticmethod
     def write_errors(e):
