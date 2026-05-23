@@ -98,9 +98,11 @@ class MainLoop:
                 time_to_format = time.localtime()
                 hours, minutes, seconds = time_to_format[3], time_to_format[4], time_to_format[5]
                 if time_zone[0] == '+':
-                    hours += int(time_zone[1])
+                    hours += int(time_zone[1:])
                 elif time_zone[0] == '-':
-                    hours -= int(time_zone[1])
+                    hours -= int(time_zone[1:])
+
+                hours %= 24
 
                 if hours < 10:
                     hours = str(hours)
